@@ -1,0 +1,203 @@
+let templates = JSON.parse(localStorage.getItem("templates")) || []
+let scores = JSON.parse(localStorage.getItem("scores")) || []
+
+const gallery = document.getElementById("gallery")
+const voteArea = document.getElementById("voteArea")
+
+document.getElementById("upload").addEventListener("change", e=>{
+
+let file=e.target.files[0]
+
+let reader=new FileReader()
+
+reader.onload = event=>{
+
+templates.push({
+
+img:event.target.result,
+votes:0
+
+})
+
+saveTemplates()
+renderTemplates()
+
+}
+
+reader.readAsDataURL(file)
+
+})
+
+
+function vote(i){
+
+templates[i].votes++
+
+saveTemplates()
+renderTemplates()
+
+}
+
+
+function saveTemplates(){
+
+localStorage.setItem("templates",JSON.stringify(templates))
+
+}
+
+
+function renderTemplates(){
+
+gallery.innerHTML=""
+voteArea.innerHTML=""
+
+templates.forEach((t,i)=>{
+
+let div=document.createElement("div")
+
+div.className="template"
+
+div.innerHTML=`
+<img src="${t.img}">
+<p>Votes: ${t.votes}</p>
+<button onclick="vote(${i})">Vote</button>
+`
+
+voteArea.appendChild(div)
+
+})
+
+}
+
+renderTemplates()
+
+
+
+const canvas = document.getElementById("game")
+const ctx = canvas.getContext("2d")
+
+const grid = 30
+
+let board=[]
+
+for(let r=0;r<20;r++){
+
+board[r]=[]
+
+for(let c=0;c<10;c++){
+
+board[r][c]=0
+
+}
+
+}
+
+const pieces=[
+
+[[1,1,1],[0,1,0]],
+[[1,1],[1,1]],
+[[1,1,0],[0,1,1]],
+[[0,1,1],[1,1,0]]
+
+]
+
+let piece=null
+let score=0
+
+function newPiece(){
+
+piece={
+
+shape:pieces[Math.floor(Math.random()*pieces.length)],
+x:4,
+y:0
+
+}
+
+}
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+for(let r=0;r<20;r++){
+
+for(let c=0;c<10;c++){
+
+if(board[r][c]){
+
+ctx.fillStyle="cyan"
+ctx.fillRect(c*grid,r*grid,grid-1,grid-1)
+
+}
+
+}
+
+}
+
+if(piece){
+
+piece.shape.forEach((row,y)=>{
+
+row.forEach((value,x)=>{
+
+if(value){
+
+ctx.fillStyle="orange"
+ctx.fillRect((piece.x+x)*grid,(piece.y+y)*grid,grid-1,grid-1)
+
+}
+
+})
+
+})
+
+}
+
+}
+
+function drop(){
+
+piece.y++
+
+if(piece.y>18){
+
+merge()
+newPiece()
+score++
+
+}
+
+draw()
+
+}
+
+function merge(){
+
+piece.shape.forEach((row,y)=>{
+
+row.forEach((value,x)=>{
+
+if(value){
+
+board[piece.y+y][piece.x+x]=1
+
+}
+
+})
+
+})
+
+}
+
+function startGame(){
+
+score=0
+
+newPiece()
+
+setInterval(drop,500)
+
+}
+
+document.getElementById("startBtn").onclick=startGame
