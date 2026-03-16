@@ -1,18 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>ExploreBaga Tetris</title>
-
-<link rel="stylesheet" href="style.css">
-
 <style>
-
 body{
 background:#0c0c0c;
 color:white;
@@ -31,7 +23,7 @@ padding:15px;
 margin:20px auto;
 padding:20px;
 border:1px solid #333;
-max-width:500px;
+max-width:420px;
 }
 
 canvas{
@@ -41,20 +33,17 @@ border:3px solid #00ff88;
 
 button{
 padding:10px;
-margin:10px;
-background:#00ff88;
+margin:10px;ackground:#00ff88;
 border:none;
 cursor:pointer;
 font-size:16px;
 }
 
-img{
-width:80px;
-height:80px;
-object-fit:cover;
-margin:5px;
+.stats{
+display:flex;
+justify-content:space-around;
+margin-top:10px;
 }
-
 </style>
 
 </head>
@@ -62,56 +51,222 @@ margin:5px;
 <body>
 
 <header>
-
 <h1>🎮 ExploreBaga Tetris</h1>
-
 <p>Create • Vote • Play</p>
-
 </header>
 
-
 <section class="panel">
 
-<h2>Upload Drawing Template</h2>
-
-<input type="file" id="upload">
-
-<div id="gallery"></div>
-
-</section>
-
-
-<section class="panel">
-
-<h2>Vote Templates</h2>
-
-<div id="voteArea"></div>
-
-</section>
-
-
-<section class="panel">
-
-<h2>Play ExploreBaga Tetris</h2>
+<h2>Play</h2>
 
 <canvas id="game" width="300" height="600"></canvas>
 
-<br>
+<div class="stats">
+<div>Score: <span id="score">0</span></div>
+<div>Lines: <span id="lines">0</span></div>
+<div>Level: <span id="level">1</span></div>
+</div>
 
-<button onclick="startGame()">Start Game</button>
+<button onclick="startGame()">Start</button>
+<button onclick="restartGame()">Restart</button>
+
+<p>Controls: ← → ↓ move | ↑ rotate | P pause</p>
 
 </section>
 
-
 <script>
 
-let templates=[]
+const canvas=document.getElementById("game")
+const ctx=canvas.getContext("2d")
 
-const gallery=document.getElementById("gallery")
-const voteArea=document.getElementById("voteArea")
+const ROWS=20
+const COLS=10
+const SIZE=30
 
-document.getElementById("upload").addEventListener("change",function(e){
+let board=[]
+let piece
+let score=0
+let lines=0
+let level=1
+let dropSpeed=500
+let gameInterval
+let paused=false
 
-let file=e.target.files[0]
+function createBoard(){
+board=[]
+for(let r=0;r<ROWS;r++){
+board[r]=[]
+for(let c=0;c<COLS;c++){
+board[r][c]=0
+}
+}
+}
 
-let
+const pieces=[
+[[1,1,1,1]],
+[[1,1],[1,1]],
+[[0,1,0],[1,1,1]],
+[[1,1,0],[0,1,1]],
+[[0,1,1],[1,1,0]],
+[[1,0,0],[1,1,1]],
+[[0,0,1],[1,1,1]]
+]
+
+function randomPiece(){
+let shape=pieces[Math.floor(Math.random()*pieces.length)]
+return {shape:shape,x:3,y:0}
+}
+
+function drawCell(x,y,color){
+ctx.fillStyle=color
+ctx.fillRect(x*SIZE,y*SIZE,SIZE-1,SIZE-1)
+}
+
+function drawBoard(){
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+for(let r=0;r<ROWS;r++){
+for(let c=0;c<COLS;c++){
+if(board[r][c]){
+drawCell(c,r,"cyan")
+}
+}
+}
+
+piece.shape.forEach((row,y)=>{
+row.forEach((value,x)=>{
+if(value){
+drawCell(piece.x+x,piece.y+y,"orange")
+}
+})
+})
+}
+
+function collide(){
+for(let y=0;y<piece.shape.length;y++){
+for(let x=0;x<piece.shape[y].length;x++){
+if(piece.shape[y][x]){
+let newX=piece.x+x
+let newY=piece.y+y
+
+if(newX<0||newX>=COLS||newY>=ROWS) return true
+if(board[newY] && board[newY][newX]) return true
+}
+}
+}
+return false
+}
+
+function merge(){
+piece.shape.forEach((row,y)=>{
+row.forEach((value,x)=>{
+if(value){
+board[piece.y+y][piece.x+x]=1
+}
+})
+})
+}
+
+function clearLines(){
+let cleared=0
+
+for(let r=ROWS-1;r>=0;r--){
+if(board[r].every(v=>v)){ board.splice(r,1)
+board.unshift(new Array(COLS).fill(0))
+cleared++
+}
+}
+
+if(cleared>0){
+score+=cleared*100
+lines+=cleared
+level=Math.floor(lines/10)+1
+dropSpeed=Math.max(100,500-(level-1)*50)
+
+document.getElementById("score").innerText=score
+document.getElementById("lines").innerText=lines
+document.getElementById("level").innerText=level
+}
+}
+
+function rotate(){
+let rotated=piece.shape[0].map((_,i)=>piece.shape.map(row=>row[i]).reverse())
+let oldShape=piece.shape
+piece.shape=rotated
+
+if(collide()){piece.shape=oldShape}
+}
+
+function drop(){
+if(paused) return
+
+piece.y++
+
+if(collide()){piece.y--
+merge()
+clearLines()
+piece=randomPiece()
+
+if(collide()){alert("Game Over! Final Score: "+score)
+restartGame()
+return
+}
+}
+
+drawBoard()
+}
+
+function move(dir){
+piece.x+=dir
+if(collide()) piece.x-=dir
+drawBoard()
+}
+
+function down(){
+piece.y++
+if(collide()){piece.y--
+merge()
+clearLines()
+piece=randomPiece()
+}
+drawBoard()
+}
+
+document.addEventListener("keydown",e=>{
+
+if(e.key==="ArrowLeft") move(-1)
+if(e.key==="ArrowRight") move(1)
+if(e.key==="ArrowDown") down()
+if(e.key==="ArrowUp") rotate()
+if(e.key==="p"||e.key==="P") paused=!paused
+
+})
+
+function startGame(){
+createBoard()
+piece=randomPiece()
+
+clearInterval(gameInterval)
+
+gameInterval=setInterval(drop,dropSpeed)
+
+drawBoard()
+}
+
+function restartGame(){
+score=0
+lines=0
+level=1
+dropSpeed=500
+
+document.getElementById("score").innerText=0
+document.getElementById("lines").innerText=0
+document.getElementById("level").innerText=1
+
+startGame()
+}
+
+</script>
+
+</body>
+</html>
