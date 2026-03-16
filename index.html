@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ExploreBaga Tetris</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+body{
+background:#0c0c0c;
+color:white;
+font-family:Arial;
+text-align:center;
+margin:0;
+}
+
+header{
+background:#00ff88;
+color:black;
+padding:15px;
+}
+
+.panel{
+margin:20px auto;
+padding:20px;
+border:1px solid #333;
+max-width:500px;
+}
+
+canvas{
+background:#111;
+border:3px solid #00ff88;
+}
+
+button{
+padding:10px;
+margin:10px;
+background:#00ff88;
+border:none;
+cursor:pointer;
+font-size:16px;
+}
+
+img{
+width:80px;
+height:80px;
+object-fit:cover;
+margin:5px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>🎮 ExploreBaga Tetris</h1>
+
+<p>Create • Vote • Play</p>
+
+</header>
+
+
+<section class="panel">
+
+<h2>Upload Drawing Template</h2>
+
+<input type="file" id="upload">
+
+<div id="gallery"></div>
+
+</section>
+
+
+<section class="panel">
+
+<h2>Vote Templates</h2>
+
+<div id="voteArea"></div>
+
+</section>
+
+
+<section class="panel">
+
+<h2>Play ExploreBaga Tetris</h2>
+
+<canvas id="game" width="300" height="600"></canvas>
+
+<br>
+
+<button onclick="startGame()">Start Game</button>
+
+</section>
+
+
+<script>
+
+let templates=[]
+
+const gallery=document.getElementById("gallery")
+const voteArea=document.getElementById("voteArea")
+
+document.getElementById("upload").addEventListener("change",function(e){
+
+let file=e.target.files[0]
+
+let
