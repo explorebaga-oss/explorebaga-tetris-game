@@ -1,0 +1,43 @@
+body{
+background:#0c0c0c;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+header{
+background:#00ff88;
+color:black;
+padding:10px;
+}
+
+.panel{
+margin:20px auto;
+padding:20px;
+border:1px solid #333;
+max-width:500px;
+}
+
+canvas{
+background:#111;
+border:3px solid #00ff88;
+}
+
+img{
+width:80px;
+height:80px;
+object-fit:cover;
+}
+
+button{
+padding:10px;
+margin:5px;
+background:#00ff88;
+border:none;
+cursor:pointer;
+}
+
+.template{
+display:inline-block;
+margin:10px;
+}
