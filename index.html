@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
 
@@ -23,11 +23,16 @@
 </header>
 
 
-<div class="game-container">
+<div class="container">
+
+<div class="game-area">
 
 <canvas id="game" width="300" height="600"></canvas>
 
-<div class="side">
+</div>
+
+
+<div class="side-panel">
 
 <h3>Next Piece</h3>
 
@@ -44,11 +49,22 @@
 </div>
 
 <button onclick="startGame()">Start</button>
+
 <button onclick="restartGame()">Restart</button>
 
+<p class="controls">
+
+Controls  
+← → move  
+↑ rotate  
+↓ drop
+
+</p>
+
 </div>
 
 </div>
+
 
 <script src="game.js"></script>
 
